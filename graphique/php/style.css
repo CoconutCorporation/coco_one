@@ -1,0 +1,45 @@
+#graphique
+{
+	display: flex; 	
+	flex-direction: column;
+}
+
+#graphique_1_0
+{
+	display: flex; 
+}
+
+#0
+{
+	width : 500px;
+}
+
+#0.h1
+{
+	width : 500px;
+	text-align: right; 
+}
+#echelle
+{
+	display: flex;
+	flex-direction: row; 
+	width : 500px; 
+	height : 20px;
+	align-items: center;
+}
+
+
+
+#ordonnee
+{
+	width : 5px; 
+	height : 500px;
+	background-color : red;
+}
+
+#abcisse
+{
+	width : 500px; 
+	height : 5px;
+	background-color : red;
+}

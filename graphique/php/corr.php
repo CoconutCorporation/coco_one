@@ -1,11 +1,43 @@
+<!doctype html>
+
 <html>
   <head>
+    <meta charset="utf-8">
+    <link href="style.css" rel="stylesheet">
     <script type="text/javascript" language="javascript">
       var coordonnes = new Array(100);
       for(i = 1; i <= 100; i++)
          coordonnes[i - 1] = new Array(2);
-      var r_square = Math.random();
-    
+      var r_square = Math.random() * 0.9 + 0.1;
+
+      
+      function init_var() // https://www.alsacreations.com/article/lire/1402-web-storage-localstorage-sessionstorage.html
+      {
+        var coord = sessionStorage.getItem("coord"); 
+        var obj = JSON.parse(coord);
+        if(obj.prop1 != NULL)
+        {
+          for(i = 1; i <= 100; i ++)
+          {
+            coordonnes[i - 1][0] = obj.prop1[i - 1][0];
+            coordonnes[i - 1][1] = obj.prop1[i - 1][1];
+          }
+        }   
+      }  
+
+      function save_var()
+      {
+        var obj = { prop1 : new Array(100)};
+        for(i = 1; i <= 100; i++)
+        {
+          obj.prop1[i - 1] = new Array(2); 
+          obj.prop1[i - 1][0] = coordonnes[i - 1][0];
+          obj.prop1[i - 1][1] = coordonnes[i - 1][1];
+        }
+
+        var obj_json = JSON.stringify(obj);
+        sessionStorage.setItem("coord", obj_son);
+      }  
       //Calcul de la loi normal inverse : https://blog.developpez.com/philben/p11198/vba-access/approximer_en_double_precision_la_loi_no
       // inverse de la fonction d'erreur complémentaire
       function iefc(proba_cum)
@@ -189,7 +221,7 @@
         return ecart;
       }
 
-      //Transformation des corrdonées pour avoir un nuage de point suivant le R aléatoire 
+      //Transformation des coordonées pour avoir un nuage de point suivant le R aléatoire 
       function generate_point()
       {
         fillCoord_normal();
@@ -199,36 +231,57 @@
 
       function draw() 
       {
-        var cav = document.getElementById("graphique");
+        var cav = document.getElementById("graphique_cav");
         var cxt = cav.getContext('2d');
-        generate_point();
+        var is_first_passage = <?php echo json_encode($_POST['cacher']);?>;
+        if(is_first_passage == "false") {
+          generate_point();
+        }
         for(i = 1; i <= 100; i ++)
         {
           cxt.fillRect(coordonnes[i - 1][0]*250 - 3, 500-coordonnes[i - 1][1]*250 - 3, 5, 5);
         }
+        document.write(r_square);
+        document.write('/');
+        document.write(getRsquare());
+        save_var();
       }
       
     </script>
   </head>
   
   <body>
+    <?php print_r($_POST) ?>
     
     <div id ="global">
-      <div id="gaphique">
-        <div id = "ordonnee"></div>
-        <div id="graphique_1.0">
-          <canvas id="graphique" width="500" height="500"></canvas>
-          <div id ="abcisse"></div>
+      <div id="graphique">
+        <div id="graphique_1_0">
+          <div id ="ordonnee"></div>
+          <canvas id="graphique_cav" width="500" height="500"></canvas>
+        </div>
+        <div id = "abcisse"></div>
+        <div id ="echelle">
+          <div id="0">0</div>
+          <div id="1">1</div>
         </div>
       </div>
-
-      <form method="post" action="coor.php">
-
-      </form>
-
     </div>
     <script type="text/javascript" language="javascript"> 
+      init_var();
       draw();
     </script>
+      <?php 
+        if($_POST['cacher'] == "false")
+        {
+        echo ('<form name="form" method="post" action="corr.php">
+          <input type="hidden" name="cacher" value="true"></input>');
+         echo('<input type="submit" name="oui" value="1">
+        </form>');
+        }else{
+         echo ('<form name="form" method="post" action="corr.php">
+          <input type="hidden" name="cacher" value="false"></input>
+          <input type="submit" name="non" value="2">
+        </form>');
+        }?>
   </body>
 </html>
