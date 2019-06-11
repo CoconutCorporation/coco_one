@@ -13,16 +13,18 @@
       
       function init_var() // https://www.alsacreations.com/article/lire/1402-web-storage-localstorage-sessionstorage.html
       {
-        var coord = sessionStorage.getItem("coord"); 
-        var obj = JSON.parse(coord);
-        if(obj.prop1 != NULL)
-        {
-          for(i = 1; i <= 100; i ++)
+        if(typeof localStorage!='undefined') {
+          var coord = sessionStorage.getItem("coord"); 
+          var obj = JSON.parse(coord);
+          if(sessionStorage.getItem("save") != null)
           {
-            coordonnes[i - 1][0] = obj.prop1[i - 1][0];
-            coordonnes[i - 1][1] = obj.prop1[i - 1][1];
-          }
-        }   
+            for(i = 1; i <= 100; i ++)
+            {
+              coordonnes[i - 1][0] = obj.prop1[i - 1][0];
+              coordonnes[i - 1][1] = obj.prop1[i - 1][1];
+            }
+          }   
+        }
       }  
 
       function save_var()
@@ -36,7 +38,8 @@
         }
 
         var obj_json = JSON.stringify(obj);
-        sessionStorage.setItem("coord", obj_son);
+        sessionStorage.setItem("coord", obj_json);
+        sessionStorage.setItem("save", "true");
       }  
       //Calcul de la loi normal inverse : https://blog.developpez.com/philben/p11198/vba-access/approximer_en_double_precision_la_loi_no
       // inverse de la fonction d'erreur complémentaire
