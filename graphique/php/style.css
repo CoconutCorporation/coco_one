@@ -2,6 +2,7 @@
 {
 	display: flex; 	
 	flex-direction: column;
+	float : left;
 }
 
 #graphique_1_0
@@ -9,26 +10,24 @@
 	display: flex; 
 }
 
-#0
-{
-	width : 500px;
-}
-
-#0.h1
-{
-	width : 500px;
-	text-align: right; 
-}
 #echelle
 {
-	display: flex;
-	flex-direction: row; 
+	/*display: flex;
+	flex-direction: row; */
 	width : 500px; 
 	height : 20px;
-	align-items: center;
 }
 
+#number_one
+{
+	float : right;
+	margin-left : 450px;
+}
 
+#number_zero
+{
+	float : left;
+}
 
 #ordonnee
 {
@@ -43,3 +42,9 @@
 	height : 5px;
 	background-color : red;
 }
+
+.form
+{
+	float : center;
+}
+

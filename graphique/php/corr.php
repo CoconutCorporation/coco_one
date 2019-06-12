@@ -4,27 +4,28 @@
   <head>
     <meta charset="utf-8">
     <link href="style.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script type="text/javascript" language="javascript">
       var coordonnes = new Array(100);
       for(i = 1; i <= 100; i++)
          coordonnes[i - 1] = new Array(2);
-      var r_square = Math.random() * 0.9 + 0.1;
-
-      
+      //var r_square = Math.random() * 0.9 + 0.1;
+      var r_square = <?php $r_square = mt_rand(0,1)/ getrandmax() * 0.9 + 0.1; echo($r_square);?>;//Faire en sorte que r_square soit bon
+      document.write("pute" + r_quare);
       function init_var() // https://www.alsacreations.com/article/lire/1402-web-storage-localstorage-sessionstorage.html
       {
-        if(typeof localStorage!='undefined') {
-          var coord = sessionStorage.getItem("coord"); 
-          var obj = JSON.parse(coord);
-          if(sessionStorage.getItem("save") != null)
-          {
-            for(i = 1; i <= 100; i ++)
+          if(typeof localStorage!="undefined") {
+            var coord = sessionStorage.getItem("coord"); 
+            var obj = JSON.parse(coord);
+            if(sessionStorage.getItem("save") != null)
             {
-              coordonnes[i - 1][0] = obj.prop1[i - 1][0];
-              coordonnes[i - 1][1] = obj.prop1[i - 1][1];
-            }
-          }   
-        }
+              for(i = 1; i <= 100; i ++)
+              {
+                coordonnes[i - 1][0] = obj.prop1[i - 1][0];
+                coordonnes[i - 1][1] = obj.prop1[i - 1][1];
+              }
+            }   
+          }
       }  
 
       function save_var()
@@ -236,18 +237,18 @@
       {
         var cav = document.getElementById("graphique_cav");
         var cxt = cav.getContext('2d');
-        var is_first_passage = <?php echo json_encode($_POST['cacher']);?>;
-        if(is_first_passage == "false") {
+        var is_first_passage = <?php if(empty($_POST['resultat']) == false) 
+                                        echo json_encode($_POST['resultat']);
+                                      else 
+                                        echo("null");
+                                        ?>;
+        if(is_first_passage == "false" || is_first_passage == null) {
           generate_point();
         }
         for(i = 1; i <= 100; i ++)
         {
           cxt.fillRect(coordonnes[i - 1][0]*250 - 3, 500-coordonnes[i - 1][1]*250 - 3, 5, 5);
         }
-        document.write(r_square);
-        document.write('/');
-        document.write(getRsquare());
-        save_var();
       }
       
     </script>
@@ -264,27 +265,33 @@
         </div>
         <div id = "abcisse"></div>
         <div id ="echelle">
-          <div id="0">0</div>
-          <div id="1">1</div>
+          <div id="number_zero"><h7>0</h7></div>
+          <div id="number_one"><h7>1</h7></div>
         </div>
       </div>
     </div>
+    <canvas id="myChart"></canvas>
+
     <script type="text/javascript" language="javascript"> 
       init_var();
       draw();
+      save_var();
     </script>
-      <?php 
-        if($_POST['cacher'] == "false")
-        {
-        echo ('<form name="form" method="post" action="corr.php">
-          <input type="hidden" name="cacher" value="true"></input>');
-         echo('<input type="submit" name="oui" value="1">
+
+    <?php 
+      if(empty($_POST['resultat'])  || $_POST['resultat'] == "false")
+      {
+        echo ('<form name="form" method="post" class="form" action="corr.php">
+          <input type="text" name="r_input" id="r_input" value="0.">
+          <input type="hidden" name="resultat" value="true"></input>');
+         echo('<input type="submit" id="submit" name="oui" value="guess">
         </form>');
-        }else{
-         echo ('<form name="form" method="post" action="corr.php">
-          <input type="hidden" name="cacher" value="false"></input>
-          <input type="submit" name="non" value="2">
+      }else{
+         //$ecart =  inval($_POST['r_input']);
+         echo ('<form name="form" method="post" class="form" action="corr.php">
+          <input type="hidden" name="resultat" value="false"></input>
+          <input type="submit" name="non" id="submit" value="next">
         </form>');
-        }?>
+      }?>
   </body>
 </html>
