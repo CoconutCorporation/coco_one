@@ -4,14 +4,23 @@
   <head>
     <meta charset="utf-8">
     <link href="style.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" language="javascript">
       var coordonnes = new Array(100);
       for(i = 1; i <= 100; i++)
          coordonnes[i - 1] = new Array(2);
-      //var r_square = Math.random() * 0.9 + 0.1;
-      var r_square = <?php $r_square = mt_rand(0,1)/ getrandmax() * 0.9 + 0.1; echo($r_square);?>;//Faire en sorte que r_square soit bon
-      document.write("pute" + r_quare);
+      var r_square = <?php               s
+                       function nombre_decimal($min = 0, $max = 1) {
+                        return $min + rand() / getrandmax() * ($max - $min); 
+                       }
+                       $r_square = nombre_decimal(0.1, 1); 
+                       echo($r_square);?>;//Faire en sorte que r_square soit bon
+      var  vie = <?php                       
+                        if($_POST['vie'] != '0' && empty($_POST['vie']) == false)
+                          $vie = $_POST['vie'];
+                        else
+                          $vie = 3;
+                  ?>;         
       function init_var() // https://www.alsacreations.com/article/lire/1402-web-storage-localstorage-sessionstorage.html
       {
           if(typeof localStorage!="undefined") {
@@ -41,6 +50,7 @@
         var obj_json = JSON.stringify(obj);
         sessionStorage.setItem("coord", obj_json);
         sessionStorage.setItem("save", "true");
+        sessionStorage.setItem("vie", vie);
       }  
       //Calcul de la loi normal inverse : https://blog.developpez.com/philben/p11198/vba-access/approximer_en_double_precision_la_loi_no
       // inverse de la fonction d'erreur complémentaire
@@ -251,12 +261,64 @@
         }
       }
       
+      function getValue()
+      {
+        document.write("ptn de script qui marche pas !");
+        return 0;
+      }
+      
     </script>
   </head>
   
   <body>
-    <?php print_r($_POST) ?>
-    
+    <?php print_r($_POST);
+        $ecart = 0;
+        function saisie(){
+        
+         //////////////////////////CONNEXION SERVEUR + SELECTION BD//////////////////////////
+        			// Déclaration des variables pour la connexion
+        			$serveur = 'localhost';
+        			$nom_base = 'guess_the_coco';
+        			$login = 'root';		//utilisateur par défaut
+        			$motdepasse = '';		//mot de passe par défaut pour "root" (pas de pwd)
+        		
+        			// connexion à MySQL
+        			$id_con = mysql_connect($serveur, $login, $motdepasse);
+        
+        			// sélection de la base de données
+        			$stat_con = mysql_select_db ($nom_base, $id_con);
+        //////////////////////////////////ENREGISTREMENT EN BDD//////////////////////////////////
+                    //On récupère les valeurs entrées par l'internaute :
+                    $T_reponse=0;
+                    
+                    
+                    $R_carre_estime=$_POST['R_carre_estime'];
+                    
+                    
+                    $R_carre_Reel=$_POST['R_carre_Reel'];
+                    
+                    $Marge_erreur= $_POST['R_carre_Reel'] - $_POST['R_carre_estime'];
+                    
+                    $T_jeu=0;
+                    
+                    $id_joueur = 1; 
+                    
+                 
+                    //On prépare la commande sql d'insertion
+                    $req = 'INSERT INTO jeu(Id_joueur, T_reponse, R_carre_estime, R_carre_Reel, Marge_erreur, T_jeu) VALUES("'.$id_joueur.'","'.$T_reponse.'","'.$R_carre_estime.'","'.$R_carre_Reel.'","'.$Marge_erreur.'","'.$T_jeu.'")'; 
+                        
+                    //on lance la commande (mysql_query) 
+                    mysql_query($req);    			    
+                    // on ferme la connexion
+                    mysql_close();
+               
+        }
+        if($_POST['resultat'] == "true" && empty($_POST['resultat']) == false)
+        {
+           saisie();
+       
+        }
+      ?>
     <div id ="global">
       <div id="graphique">
         <div id="graphique_1_0">
@@ -271,7 +333,7 @@
       </div>
     </div>
     <canvas id="myChart"></canvas>
-
+    
     <script type="text/javascript" language="javascript"> 
       init_var();
       draw();
@@ -279,17 +341,30 @@
     </script>
 
     <?php 
-      if(empty($_POST['resultat'])  || $_POST['resultat'] == "false")
-      {
-        echo ('<form name="form" method="post" class="form" action="corr.php">
-          <input type="text" name="r_input" id="r_input" value="0.">
-          <input type="hidden" name="resultat" value="true"></input>');
+      //Affichage du jeux 
+      if(empty($_POST['resultat'])  || $_POST['resultat'] == "false" && $_POST['vie'] != '0')
+      {        
+        
+        echo ('<form name="form" id="form" method="post" class="form" action="corr.php">
+          <input type="text" name="R_carre_estime" id="r_input" value="0.">
+          <input type="hidden" name="resultat" value="true"></input> 
+          <input type="hidden" name="R_carre_Reel" value="'.$r_square.'"></input>
+          <input type="hidden" name="vie" value="'.$vie.'"></input>
+          '); 
          echo('<input type="submit" id="submit" name="oui" value="guess">
         </form>');
-      }else{
-         //$ecart =  inval($_POST['r_input']);
+      }
+      else if($_POST['vie'] != '0')   //Affichage du GAME-OVER
+      {
+      }else{               //Affichage du résultat
+        $ecart =  $_POST['R_carre_Reel'] - $_POST['R_carre_estime'] ;
+        if($ecart < 0)
+          $ecart = $ecart * -1;
+        if($ecart > 0.1)
+          $vie = $vie - 1;
          echo ('<form name="form" method="post" class="form" action="corr.php">
           <input type="hidden" name="resultat" value="false"></input>
+          <input type="hidden" name="vie" value="'.$vie.'"></input>
           <input type="submit" name="non" id="submit" value="next">
         </form>');
       }?>
